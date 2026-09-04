@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Stride"
+rootProject.name = "Step"
 include(":app")

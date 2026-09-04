@@ -1,7 +1,7 @@
 <a id="top"></a>
 <div align="center">
 
-<img src="docs/logo.png" width="220" height="220" alt="Stride">
+<img src="docs/logo.png" width="220" height="220" alt="Step">
 
 # STRIDE
 
@@ -9,7 +9,7 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:00A88E,100:3DDC84&height=90&section=header&animation=fadeIn" width="100%" height="90" alt="divider">
 
-[![Download APK](https://img.shields.io/github/v/release/NikhilKain/stride?label=Download%20APK&style=for-the-badge&color=00A88E&logo=android&logoColor=white&labelColor=0d1117)](https://github.com/NikhilKain/stride/releases/latest)
+[![Download APK](https://img.shields.io/github/v/release/NikhilKain/step?label=Download%20APK&style=for-the-badge&color=00A88E&logo=android&logoColor=white&labelColor=0d1117)](https://github.com/NikhilKain/step/releases/latest)
 [![Android](https://img.shields.io/badge/Android-8.0+-3DDC84?style=for-the-badge&logo=android&logoColor=white&labelColor=0d1117)](#)
 [![License](https://img.shields.io/badge/License-GPLv3-00A88E?style=for-the-badge&labelColor=0d1117)](LICENSE)
 [![Kotlin](https://img.shields.io/badge/Kotlin-100%25-00A88E?style=for-the-badge&logo=kotlin&logoColor=white&labelColor=0d1117)](https://kotlinlang.org)
@@ -17,7 +17,7 @@
 <br/>
 
 [![Features](https://img.shields.io/badge/Features-00A88E?style=for-the-badge)](#features)
-[![Stride Pro](https://img.shields.io/badge/Stride_Pro-3DDC84?style=for-the-badge)](#editions)
+[![Step Pro](https://img.shields.io/badge/Step_Pro-3DDC84?style=for-the-badge)](#editions)
 [![Screenshots](https://img.shields.io/badge/Screenshots-00A88E?style=for-the-badge)](#screenshots)
 [![Build](https://img.shields.io/badge/Build_it-3DDC84?style=for-the-badge)](#build-it-yourself)
 [![Under the Hood](https://img.shields.io/badge/Under_the_Hood-00A88E?style=for-the-badge)](#under-the-hood)
@@ -30,7 +30,7 @@
 ## Why another step counter?
 
 Most of them want a login, a subscription, and permission to sell your movement
-data to whoever asks. Stride wants none of that. It counts your steps, draws them
+data to whoever asks. Step wants none of that. It counts your steps, draws them
 beautifully, and otherwise leaves you alone.
 
 It reads from **Health Connect** when you allow it and falls back to the phone's
@@ -49,22 +49,19 @@ more steps, never by adding them, so nothing is ever double-counted.
 A foreground service keeps counting with the screen off and survives a reboot. The hardware counter does the work in silicon, so the battery cost is close to nothing.
 
 **📊 A dashboard worth opening**
-A wavy ring that fills as you walk, an odometer that rolls digit by digit, and distance, calories and active minutes underneath. Distance uses a stride length calibrated from your height (with a manual override), not a guess.
+A wavy ring that fills as you walk, an odometer that rolls digit by digit, and active minutes underneath.
 
 **📅 History at a glance**
 A weekly bar chart and a monthly calendar heatmap, with any day tappable for the detail.
 
-**🏅 Streaks and 14 achievements**
-Each a morphing Material shape rather than another gold star — from *First Steps* to *Millionaire* at 1,000,000 lifetime steps.
+**🎯 Daily goals & weekly trends**
+Watch your daily ring fill up and track your progress across the week with clean visual charts.
 
 **🔔 Live Updates on Android 16**
-A promoted ongoing notification puts your progress in the status bar. Support is patchy across manufacturers, so Stride tells you honestly whether your ROM renders it — and falls back to its own island-style overlay when it doesn't.
+A promoted ongoing notification puts your progress in the status bar. Support is patchy across manufacturers, so Step tells you honestly whether your ROM renders it — and falls back to its own island-style overlay when it doesn't.
 
 </td>
 <td width="50%" valign="top">
-
-**🖼️ Share cards, three ways**
-Renders your day as a Story (1080×1920), Post (1080×1350), or Square (1080×1080) image, gradient and all, ready for wherever you post things.
 
 **🎨 Theming, seriously**
 Light, dark, system, or pure-black AMOLED. Material You wallpaper colours. Four hand-tuned palettes, five colour styles, and seven bundled variable fonts you can actually tell apart.
@@ -85,9 +82,9 @@ English, Arabic, German, Spanish, French, Hindi, Portuguese, and Russian, with a
 <a id="editions"></a>
 ## 💎 Editions
 
-Stride is developed **open-core** — one codebase, one APK, not a separate download. Everything in this repository is free forever: tracking, history, all 14 achievements, 2 of the 4 palettes (*Tide* and *Zen*), all 5 colour styles, all 7 fonts, backups, and the built-in updater. Nothing here is time-limited, nagged, or switched off to upsell you.
+Step is developed **open-core** — one codebase, one APK, not a separate download. Everything in this repository is free forever: tracking, history, 2 of the 4 palettes (*Tide* and *Zen*), all 5 colour styles, all 7 fonts, backups, and the built-in updater. Nothing here is time-limited, nagged, or switched off to upsell you.
 
-A one-time Gumroad licence key unlocks **Stride Pro** in the same app:
+A one-time Gumroad licence key unlocks **Step Pro** in the same app:
 
 <table>
 <tr><td>
@@ -99,7 +96,7 @@ A one-time Gumroad licence key unlocks **Stride Pro** in the same app:
 
 <div align="center">
 
-[![Get Stride Pro](https://img.shields.io/badge/Get_Stride_Pro-00A88E?style=for-the-badge&logo=gumroad&logoColor=white&labelColor=0d1117)](https://narzo7.gumroad.com/l/quqta)
+[![Get Step Pro](https://img.shields.io/badge/Get_Step_Pro-00A88E?style=for-the-badge&logo=gumroad&logoColor=white&labelColor=0d1117)](https://narzo7.gumroad.com/l/quqta)
 
 </div>
 
@@ -118,17 +115,17 @@ A one-time Gumroad licence key unlocks **Stride Pro** in the same app:
 </p>
 
 <p align="center">
-  <sub><i>Some shots are from Stride Pro — see <a href="#editions">Editions</a>.</i></sub>
+  <sub><i>Some shots are from Step Pro — see <a href="#editions">Editions</a>.</i></sub>
 </p>
 
 ## Install
 
-Grab the APK from [Releases](https://github.com/NikhilKain/stride/releases/latest).
+Grab the APK from [Releases](https://github.com/NikhilKain/step/releases/latest).
 Android 8.0 or newer.
 
-On first launch Stride asks for **Physical activity** — it genuinely cannot count
+On first launch Step asks for **Physical activity** — it genuinely cannot count
 steps without it. Notifications are optional, and only used for the ongoing
-counter and goal nudges.
+counter.
 
 <a id="build-it-yourself"></a>
 ## 🔧 Build it yourself
@@ -136,8 +133,8 @@ counter and goal nudges.
 You need **JDK 17** and the Android SDK with **API 36**.
 
 ```bash
-git clone https://github.com/NikhilKain/stride
-cd stride
+git clone https://github.com/NikhilKain/step
+cd step
 ./gradlew assembleDebug
 ```
 
@@ -159,9 +156,9 @@ The app builds and runs fully without it — the Gumroad product ID in `local.pr
 
 | Key | Purpose | If omitted |
 |---|---|---|
-| `gumroad.product.id` | Stride Pro licence verification | Verification disabled — Pro stays locked |
+| `gumroad.product.id` | Step Pro licence verification | Verification disabled — Pro stays locked |
 
-Everything else — tracking, history, achievements, the free palettes and fonts, backups, and the updater — works fully without any secrets configured.
+Everything else — tracking, history, the free palettes and fonts, backups, and the updater — works fully without any secrets configured.
 
 </details>
 
@@ -190,7 +187,7 @@ stable release yet.
 
 ## Contributing
 
-Issues and pull requests are welcome. Because Stride Pro shares this codebase,
+Issues and pull requests are welcome. Because Step Pro shares this codebase,
 contributions need a short copyright assignment before they can be merged — open
 an issue first and we'll sort it out there.
 
@@ -204,10 +201,10 @@ bundled as an additional display option.
 <a id="support"></a>
 ## 💖 Support
 
-If Stride is useful to you:
+If Step is useful to you:
 - ⭐ Star this repo
-- 💎 Grab [Stride Pro](https://narzo7.gumroad.com/l/quqta) — it's the main thing that funds ongoing development
-- 🐛 Report bugs in [Issues](https://github.com/NikhilKain/stride/issues)
+- 💎 Grab [Step Pro](https://narzo7.gumroad.com/l/quqta) — it's the main thing that funds ongoing development
+- 🐛 Report bugs in [Issues](https://github.com/NikhilKain/step/issues)
 
 ### ☕ Buy Me a Coffee
 
@@ -227,7 +224,7 @@ Every contribution goes directly toward new features, bug fixes, performance imp
 
 [![License](https://img.shields.io/badge/License-GPLv3-00A88E?style=for-the-badge&labelColor=0d1117)](LICENSE)
 
-Stride is free software: redistribute and modify it under the terms of the GPL.
+Step is free software: redistribute and modify it under the terms of the GPL.
 It comes with no warranty.
 
 <br/>

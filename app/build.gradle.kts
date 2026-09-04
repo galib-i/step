@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.vythera.stride"
+    namespace = "com.galib.step"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.vythera.stride"
+        applicationId = "com.galib.step"
         minSdk = 26
         // API 36 — required for Android 16 Live Updates (promoted ProgressStyle)
         targetSdk = 36
@@ -63,8 +63,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.graphics:graphics-shapes:1.0.1")
     implementation("androidx.navigation:navigation-compose:2.9.5")
-
-    implementation("androidx.health.connect:connect-client:1.1.0")
 
     implementation("androidx.room:room-runtime:2.8.2")
     implementation("androidx.room:room-ktx:2.8.2")
