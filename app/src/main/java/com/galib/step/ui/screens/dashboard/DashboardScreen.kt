@@ -29,6 +29,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -151,6 +153,11 @@ class DashboardViewModel : ViewModel() {
         com.galib.step.service.StepTrackingService.stop(context)
         viewModelScope.launch { prefs.setBackgroundTracking(false) }
     }
+
+    fun startBackgroundTracking(context: Context) {
+        runCatching { com.galib.step.service.StepTrackingService.start(context) }
+        viewModelScope.launch { prefs.setBackgroundTracking(true) }
+    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -166,6 +173,26 @@ fun DashboardScreen(
     var showGoalSheet by remember { mutableStateOf(false) }
     @Suppress("DEPRECATION")
     val goalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val notifLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { }
+    val activityRecognitionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) viewModel.startBackgroundTracking(context)
+    }
+
+    fun ensureActivityPermission(): Boolean {
+        val granted = android.os.Build.VERSION.SDK_INT < 29 ||
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context, android.Manifest.permission.ACTIVITY_RECOGNITION
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            activityRecognitionLauncher.launch(android.Manifest.permission.ACTIVITY_RECOGNITION)
+        }
+        return granted
+    }
 
     // Haptic tick every 1,000 steps
     var lastBucket by remember { mutableIntStateOf(-1) }
@@ -185,22 +212,34 @@ fun DashboardScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(bottom = 100.dp)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(Modifier.height(8.dp))
-            DashboardHeader(modifier = Modifier.entrance(0))
+            DashboardHeader(
+                isTracking = state.prefs.backgroundTracking,
+                modifier = Modifier.entrance(0)
+            )
 
-            if (state.prefs.backgroundTracking) {
-                TrackingBanner(
-                    onStop = { viewModel.stopBackgroundTracking(context) },
-                    modifier = Modifier.entrance(0)
-                )
-            }
+
 
             HeroCard(
                 stats = state.stats,
+                isTracking = state.prefs.backgroundTracking,
+                onToggleTracking = {
+                    if (state.prefs.backgroundTracking) {
+                        viewModel.stopBackgroundTracking(context)
+                    } else {
+                        if (android.os.Build.VERSION.SDK_INT >= 33) {
+                            notifLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        if (ensureActivityPermission()) {
+                            viewModel.startBackgroundTracking(context)
+                        }
+                    }
+                },
                 onEditGoal = { showGoalSheet = true },
                 modifier = Modifier.entrance(1)
             )
@@ -227,7 +266,6 @@ fun DashboardScreen(
             }
 
 
-            Spacer(Modifier.height(120.dp)) // room for floating nav
         }
     }
 
@@ -290,7 +328,10 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun DashboardHeader(modifier: Modifier = Modifier) {
+private fun DashboardHeader(
+    isTracking: Boolean,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -308,6 +349,31 @@ private fun DashboardHeader(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
+        if (isTracking) {
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .pulse(from = 0.8f, to = 1.25f, durationMs = 900)
+                    )
+                    Text(
+                        text = "Active",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -315,6 +381,8 @@ private fun DashboardHeader(modifier: Modifier = Modifier) {
 @Composable
 private fun HeroCard(
     stats: DailyStats,
+    isTracking: Boolean,
+    onToggleTracking: () -> Unit,
     onEditGoal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -410,6 +478,23 @@ private fun HeroCard(
                     else MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center
                 )
+                
+                androidx.compose.material3.FilledTonalButton(
+                    onClick = onToggleTracking,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth(0.6f).height(56.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isTracking) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                        contentDescription = if (isTracking) "Pause Tracking" else "Resume Tracking",
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(Modifier.size(12.dp, 0.dp))
+                    Text(
+                        text = if (isTracking) "Pause" else "Resume",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
         }
     }
@@ -479,45 +564,6 @@ private fun WeeklyGoalCard(weekSteps: Long, weeklyGoal: Int, modifier: Modifier 
     }
 }
 
-@Composable
-private fun TrackingBanner(onStop: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(9.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .pulse(from = 0.8f, to = 1.25f, durationMs = 900)
-            )
-            Text(
-                text = stringResource(R.string.tracking_active),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                modifier = Modifier.weight(1f)
-            )
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.12f),
-                modifier = Modifier.clip(CircleShape).clickable(onClick = onStop)
-            ) {
-                Text(
-                    text = stringResource(R.string.stop),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp)
-                )
-            }
-        }
-    }
-}
+
 
 

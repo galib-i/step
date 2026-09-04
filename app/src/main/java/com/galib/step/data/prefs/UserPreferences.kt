@@ -28,7 +28,7 @@ class UserPreferences(private val context: Context) {
         val amoled = booleanPreferencesKey("amoled")
         val colorStyle = stringPreferencesKey("color_style")
         val backgroundTracking = booleanPreferencesKey("background_tracking")
-        val liveUpdates = booleanPreferencesKey("live_updates")
+
 
         // Step-sensor bookkeeping
         val sensorLastRaw = longPreferencesKey("sensor_last_raw")
@@ -46,8 +46,7 @@ class UserPreferences(private val context: Context) {
             paletteId = p[Keys.paletteId] ?: "tide",
             amoled = p[Keys.amoled] ?: false,
             colorStyle = runCatching { ColorStyle.valueOf(p[Keys.colorStyle] ?: "TONAL_SPOT") }.getOrDefault(ColorStyle.TONAL_SPOT),
-            backgroundTracking = p[Keys.backgroundTracking] ?: false,
-            liveUpdates = p[Keys.liveUpdates] ?: false
+            backgroundTracking = p[Keys.backgroundTracking] ?: true
         )
     }
 
@@ -62,7 +61,6 @@ class UserPreferences(private val context: Context) {
     suspend fun setAmoled(enabled: Boolean) = context.dataStore.edit { it[Keys.amoled] = enabled }
     suspend fun setColorStyle(style: ColorStyle) = context.dataStore.edit { it[Keys.colorStyle] = style.name }
     suspend fun setBackgroundTracking(enabled: Boolean) = context.dataStore.edit { it[Keys.backgroundTracking] = enabled }
-    suspend fun setLiveUpdates(enabled: Boolean) = context.dataStore.edit { it[Keys.liveUpdates] = enabled }
 
     data class SensorState(val lastRaw: Long, val dayEpoch: Long, val todaySteps: Long)
 

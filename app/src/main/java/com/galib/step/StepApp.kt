@@ -1,4 +1,4 @@
-﻿package com.galib.step
+package com.galib.step
 
 import android.app.Application
 import com.galib.step.data.work.SyncWorker
@@ -14,7 +14,7 @@ class StepApp : Application() {
         // Resurrect background tracking / live island if the user has them enabled
         Graph.appScope.launch {
             val p = Graph.prefs.snapshot()
-            if (p.backgroundTracking || p.liveUpdates) {
+            if (p.backgroundTracking) {
                 runCatching { StepTrackingService.start(this@StepApp) }
             }
         }

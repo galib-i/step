@@ -33,6 +33,5 @@ data class StepPrefs(
     val paletteId: String = "tide",
     val amoled: Boolean = false,
     val colorStyle: ColorStyle = ColorStyle.TONAL_SPOT,
-    val backgroundTracking: Boolean = false,
-    val liveUpdates: Boolean = false
+    val backgroundTracking: Boolean = false
 )

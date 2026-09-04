@@ -1,6 +1,5 @@
 package com.galib.step.ui.screens.settings
 
-import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
@@ -19,12 +18,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
 import androidx.compose.material.icons.rounded.Contrast
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Splitscreen
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.Wallpaper
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -53,7 +50,6 @@ import com.galib.step.R
 import com.galib.step.data.backup.BackupManager
 import com.galib.step.model.StepPrefs
 import com.galib.step.model.ThemeMode
-import com.galib.step.service.StepTrackingService
 
 import com.galib.step.ui.components.bouncyClickable
 import com.galib.step.ui.components.entrance
@@ -83,29 +79,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val prefs by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    val notifLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { }
-    // The health foreground-service type needs this granted at runtime,
-    // otherwise startForeground throws and the service dies.
-    val activityRecognitionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) runCatching { StepTrackingService.start(context) }
-    }
-
-    fun ensureActivityPermission(): Boolean {
-        val granted = Build.VERSION.SDK_INT < 29 ||
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                context, Manifest.permission.ACTIVITY_RECOGNITION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        if (!granted) {
-            activityRecognitionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-        }
-        return granted
-    }
-
     val exportedMsg = stringResource(R.string.backup_exported)
     val backupFailedMsg = stringResource(R.string.backup_failed)
     val exportLauncher = rememberLauncherForActivityResult(
@@ -202,48 +175,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
         }
 
-        SettingsCard(modifier = Modifier.entrance(2)) {
-            if (Build.VERSION.SDK_INT >= 36) {
-                SettingRow(
-                    title = stringResource(R.string.live_updates),
-                    subtitle = stringResource(R.string.live_updates_sub),
-                    icon = Icons.Rounded.Splitscreen
-                ) {
-                    IconSwitch(
-                        checked = prefs.liveUpdates,
-                        onCheckedChange = { on ->
-                            if (on) {
-                                notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                            viewModel.set { viewModel.p.setLiveUpdates(on) }
-                            if (on && ensureActivityPermission()) {
-                                runCatching { StepTrackingService.start(context) }
-                            }
-                        }
-                    )
-                }
-            }
-            SettingRow(
-                title = stringResource(R.string.background_tracking),
-                subtitle = stringResource(R.string.background_tracking_sub),
-                icon = Icons.AutoMirrored.Rounded.DirectionsRun
-            ) {
-                IconSwitch(
-                    checked = prefs.backgroundTracking,
-                    onCheckedChange = { on ->
-                        if (on && Build.VERSION.SDK_INT >= 33) {
-                            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        }
-                        viewModel.set { viewModel.p.setBackgroundTracking(on) }
-                        if (on) {
-                            if (ensureActivityPermission()) StepTrackingService.start(context)
-                        } else {
-                            StepTrackingService.stop(context)
-                        }
-                    }
-                )
-            }
-        }
+
 
 
 

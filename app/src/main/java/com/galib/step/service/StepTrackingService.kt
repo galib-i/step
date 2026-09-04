@@ -22,7 +22,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -37,9 +36,7 @@ class StepTrackingService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var trackingJob: Job? = null
 
-    /** Mirrors the user's "Live updates" preference for notification building. */
-    @Volatile
-    private var promoteLiveUpdate = false
+
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -102,21 +99,7 @@ class StepTrackingService : Service() {
                         delay((5 * 60_000).milliseconds)
                     }
                 }
-                // Live-update preference drives whether the ongoing notification
-                // is promoted to a status-bar chip
-                launch {
-                    Graph.prefs.prefs
-                        .map { it.liveUpdates }
-                        .distinctUntilChanged()
-                        .collect { enabled ->
-                            promoteLiveUpdate = enabled
-                            val stats = Graph.repository.observeToday().first()
-                            runCatching {
-                                NotificationManagerCompat.from(this@StepTrackingService)
-                                    .notify(NOTIF_ID, buildNotification(stats.steps, stats.goal))
-                            }
-                        }
-                }
+
                 // Keep the live notification's count fresh
                 Graph.repository.observeToday()
                     .map { it.steps to it.goal }
@@ -149,17 +132,6 @@ class StepTrackingService : Service() {
         )
         val progress = if (goal > 0) ((steps * 100) / goal).toInt().coerceIn(0, 100) else 0
 
-        // Android 16+ Live Updates: a progress-centric notification promoted to
-        // an ongoing "live" chip in the status bar and lock screen.
-        if (android.os.Build.VERSION.SDK_INT >= 36) {
-            val live = runCatching {
-                buildLiveUpdateNotification(progress, steps, goal, openIntent, stopIntent)
-            }.onFailure {
-                android.util.Log.e("StepTracking", "live update build failed", it)
-            }
-            live.getOrNull()?.let { return it }
-        }
-
         return NotificationCompat.Builder(this, Notifier.CHANNEL_TRACKING)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(getString(R.string.notif_steps_today, Formatters.steps(steps)))
@@ -172,60 +144,6 @@ class StepTrackingService : Service() {
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
-    }
-
-    @android.annotation.SuppressLint("WrongConstant")
-    @androidx.annotation.RequiresApi(36)
-    private fun buildLiveUpdateNotification(
-        progress: Int,
-        steps: Long,
-        goal: Int,
-        openIntent: PendingIntent,
-        stopIntent: PendingIntent
-    ): Notification {
-        val accent = ContextCompat.getColor(this, R.color.live_update_accent)
-
-        // The tracker icon rides along the bar as the day fills up; the segment
-        // spans the whole goal so progress reads as "% of goal".
-        val style = Notification.ProgressStyle()
-            .setStyledByProgress(false)
-            .setProgress(progress)
-            .setProgressSegments(
-                listOf(Notification.ProgressStyle.Segment(100).setColor(accent))
-            )
-            .setProgressTrackerIcon(
-                android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_notification)
-            )
-
-        val builder = Notification.Builder(this, Notifier.CHANNEL_TRACKING)
-            .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(getString(R.string.notif_steps_today, Formatters.steps(steps)))
-            .setContentText(getString(R.string.notif_goal_progress, progress, Formatters.steps(goal.toLong())))
-            .setStyle(style)
-            // Text shown inside the status-bar chip
-            .setShortCriticalText("$progress%")
-            // Classic progress extras as well, so notification-listener bridges
-            // (e.g. LiveBridge) that parse EXTRA_PROGRESS can render this too
-            .setProgress(100, progress, false)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setColor(accent)
-            .setColorized(true)
-            .setContentIntent(openIntent)
-            .addAction(
-                Notification.Action.Builder(null, getString(R.string.stop), stopIntent).build()
-            )
-            .setCategory(Notification.CATEGORY_WORKOUT)
-            .setVisibility(Notification.VISIBILITY_PUBLIC)
-
-        // Upgrade the ongoing progress notification into a Live Update: the
-        // status-bar chip plus prominent placement on the lock screen and at the
-        // top of the shade. Requires POST_PROMOTED_NOTIFICATIONS plus an ongoing,
-        // progress-centric notification.
-        if (promoteLiveUpdate) {
-            builder.setFlag(Notification.FLAG_PROMOTED_ONGOING, true)
-        }
-        return builder.build()
     }
 
     companion object {

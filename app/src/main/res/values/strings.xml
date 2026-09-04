@@ -39,8 +39,6 @@
     <string name="amoled_black_sub">Pure black dark mode for OLED panels</string>
 
 
-    <string name="background_tracking">Background tracking</string>
-    <string name="background_tracking_sub">Count steps all day with a live notification. Turn off to force-stop.</string>
     <string name="export_backup">Export backup</string>
     <string name="export_backup_sub">Save history and settings to a file</string>
     <string name="import_backup">Import backup</string>
@@ -68,8 +66,7 @@
     <string name="tracking_active">Background tracking is on</string>
 
     <!-- Live Updates (Android 16+) -->
-    <string name="live_updates">Live updates</string>
-    <string name="live_updates_sub">Show a live step chip in the status bar and lock screen while tracking (Android 16+).</string>
+
 
     <string name="targets">Targets</string>
 </resources>
