@@ -48,7 +48,7 @@ class StepTrackingService : Service() {
     @android.annotation.SuppressLint("InlinedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
-            scope.launch { Graph.prefs.setBackgroundTracking(false) }
+            Graph.appScope.launch { Graph.prefs.setBackgroundTracking(false) }
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
             return START_NOT_STICKY

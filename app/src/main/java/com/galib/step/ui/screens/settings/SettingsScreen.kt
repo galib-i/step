@@ -152,12 +152,12 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 SettingRow(
-                    title = stringResource(R.string.wallpaper_colors),
-                    subtitle = stringResource(R.string.wallpaper_colors_sub),
+                    title = stringResource(R.string.wallpaper_colours),
+                    subtitle = stringResource(R.string.wallpaper_colours_sub),
                     icon = Icons.Rounded.Wallpaper
                 ) {
                     IconSwitch(
-                        checked = prefs.dynamicColor,
+                        checked = prefs.dynamicColour,
                         onCheckedChange = { on -> viewModel.set { viewModel.p.setDynamicColor(on) } }
                     )
                 }

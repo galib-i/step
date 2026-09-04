@@ -32,8 +32,8 @@ import com.galib.step.util.Formatters
 fun GoalEditor(
     goal: Int,
     onGoalChange: (Int) -> Unit,
-    keyboardTrigger: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyboardTrigger: Boolean = false
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),

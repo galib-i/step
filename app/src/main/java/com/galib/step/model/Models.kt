@@ -21,7 +21,7 @@ data class DailyStats(
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 /** Monet-style palette treatments, ColorBlendr-style. */
-enum class ColorStyle { TONAL_SPOT, NEUTRAL, MONOCHROME, VIBRANT, EXPRESSIVE }
+enum class ColourStyle { TONAL_SPOT, NEUTRAL, MONOCHROME, VIBRANT, EXPRESSIVE }
 
 
 data class StepPrefs(
@@ -29,9 +29,9 @@ data class StepPrefs(
     val dailyGoal: Int = 8000,
     val weeklyGoal: Int = 56000,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val dynamicColor: Boolean = false,
+    val dynamicColour: Boolean = false,
     val paletteId: String = "tide",
     val amoled: Boolean = false,
-    val colorStyle: ColorStyle = ColorStyle.TONAL_SPOT,
+    val colourStyle: ColourStyle = ColourStyle.TONAL_SPOT,
     val backgroundTracking: Boolean = false
 )

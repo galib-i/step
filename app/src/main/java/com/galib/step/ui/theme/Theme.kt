@@ -43,7 +43,7 @@ fun StepTheme(
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
 
-    val base = if (prefs.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    val base = if (prefs.dynamicColour && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val context = LocalContext.current
         val dyn = if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         dyn.expressiveSurfaces(darkTheme)

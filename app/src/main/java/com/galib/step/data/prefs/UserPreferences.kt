@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.galib.step.model.ColorStyle
+import com.galib.step.model.ColourStyle
 import com.galib.step.model.StepPrefs
 import com.galib.step.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
@@ -23,10 +23,10 @@ class UserPreferences(private val context: Context) {
         val dailyGoal = intPreferencesKey("daily_goal")
         val weeklyGoal = intPreferencesKey("weekly_goal")
         val themeMode = stringPreferencesKey("theme_mode")
-        val dynamicColor = booleanPreferencesKey("dynamic_color")
+        val dynamicColour = booleanPreferencesKey("dynamic_color")
         val paletteId = stringPreferencesKey("palette_id")
         val amoled = booleanPreferencesKey("amoled")
-        val colorStyle = stringPreferencesKey("color_style")
+        val colourStyle = stringPreferencesKey("color_style")
         val backgroundTracking = booleanPreferencesKey("background_tracking")
 
 
@@ -42,10 +42,10 @@ class UserPreferences(private val context: Context) {
             dailyGoal = p[Keys.dailyGoal] ?: 8000,
             weeklyGoal = p[Keys.weeklyGoal] ?: 56000,
             themeMode = runCatching { ThemeMode.valueOf(p[Keys.themeMode] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM),
-            dynamicColor = p[Keys.dynamicColor] ?: false,
+            dynamicColour = p[Keys.dynamicColour] ?: false,
             paletteId = p[Keys.paletteId] ?: "tide",
             amoled = p[Keys.amoled] ?: false,
-            colorStyle = runCatching { ColorStyle.valueOf(p[Keys.colorStyle] ?: "TONAL_SPOT") }.getOrDefault(ColorStyle.TONAL_SPOT),
+            colourStyle = runCatching { ColourStyle.valueOf(p[Keys.colourStyle] ?: "TONAL_SPOT") }.getOrDefault(ColourStyle.TONAL_SPOT),
             backgroundTracking = p[Keys.backgroundTracking] ?: true
         )
     }
@@ -56,10 +56,10 @@ class UserPreferences(private val context: Context) {
     suspend fun setDailyGoal(goal: Int) = context.dataStore.edit { it[Keys.dailyGoal] = goal.coerceIn(1000, 50000) }
     suspend fun setWeeklyGoal(goal: Int) = context.dataStore.edit { it[Keys.weeklyGoal] = goal.coerceIn(0, 350000) }
     suspend fun setThemeMode(mode: ThemeMode) = context.dataStore.edit { it[Keys.themeMode] = mode.name }
-    suspend fun setDynamicColor(enabled: Boolean) = context.dataStore.edit { it[Keys.dynamicColor] = enabled }
+    suspend fun setDynamicColor(enabled: Boolean) = context.dataStore.edit { it[Keys.dynamicColour] = enabled }
     suspend fun setPaletteId(id: String) = context.dataStore.edit { it[Keys.paletteId] = id }
     suspend fun setAmoled(enabled: Boolean) = context.dataStore.edit { it[Keys.amoled] = enabled }
-    suspend fun setColorStyle(style: ColorStyle) = context.dataStore.edit { it[Keys.colorStyle] = style.name }
+    suspend fun setColourStyle(style: ColourStyle) = context.dataStore.edit { it[Keys.colourStyle] = style.name }
     suspend fun setBackgroundTracking(enabled: Boolean) = context.dataStore.edit { it[Keys.backgroundTracking] = enabled }
 
     data class SensorState(val lastRaw: Long, val dayEpoch: Long, val todaySteps: Long)
