@@ -1,5 +1,5 @@
 # Step
-Just track your steps with daily and weekly goals - nothing else.
+Just track your steps with daily and weekly targets - nothing else.
 
 <p align="center">
   <img width="200" alt="Step screenshot 1" src="https://github.com/user-attachments/assets/51f5e923-6075-4fb8-8e59-edbe589708ab" />
