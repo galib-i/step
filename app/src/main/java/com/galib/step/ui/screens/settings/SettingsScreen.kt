@@ -45,20 +45,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.net.toUri
 import com.galib.step.Graph
 import com.galib.step.R
 import com.galib.step.data.backup.BackupManager
 import com.galib.step.model.StepPrefs
 import com.galib.step.model.ThemeMode
-
 import com.galib.step.ui.components.bouncyClickable
 import com.galib.step.ui.components.entrance
-
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
 
 class SettingsViewModel : ViewModel() {
     private val prefs = Graph.prefs
@@ -113,10 +111,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
         }
     }
 
-
-
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -156,7 +150,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                     subtitle = stringResource(R.string.wallpaper_colours_sub),
                     icon = Icons.Rounded.Wallpaper
                 ) {
-                    IconSwitch(
+                    Switch(
                         checked = prefs.dynamicColour,
                         onCheckedChange = { on -> viewModel.set { viewModel.p.setDynamicColor(on) } }
                     )
@@ -167,19 +161,12 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 subtitle = stringResource(R.string.amoled_black_sub),
                 icon = Icons.Rounded.Contrast
             ) {
-                IconSwitch(
+                Switch(
                     checked = prefs.amoled,
                     onCheckedChange = { on -> viewModel.set { viewModel.p.setAmoled(on) } }
                 )
             }
-
         }
-
-
-
-
-
-
 
         SettingsCard(modifier = Modifier.entrance(5)) {
             SettingRow(
@@ -224,9 +211,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
         Spacer(Modifier.height(120.dp))
     }
-
-
-
 }
 
 @Composable
@@ -290,16 +274,4 @@ private fun SettingRow(
         }
         trailing?.invoke()
     }
-}
-
-/** Switch with the feature's icon riding inside the thumb. */
-@Composable
-private fun IconSwitch(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Switch(
-        checked = checked,
-        onCheckedChange = onCheckedChange
-    )
 }

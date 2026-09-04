@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import com.galib.step.Graph
 import com.galib.step.data.db.DailySummaryEntity
-import com.galib.step.model.ColourStyle
 import com.galib.step.model.ThemeMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -31,9 +30,7 @@ object BackupManager {
                     put("weeklyGoal", prefs.weeklyGoal)
                     put("themeMode", prefs.themeMode.name)
                     put("dynamicColour", prefs.dynamicColour)
-                    put("paletteId", prefs.paletteId)
                     put("amoled", prefs.amoled)
-                    put("colourStyle", prefs.colourStyle.name)
                 })
                 put("days", JSONArray().apply {
                     days.forEach { d ->
@@ -69,9 +66,7 @@ object BackupManager {
                 prefs.setWeeklyGoal(p.optInt("weeklyGoal", 56000))
                 runCatching { prefs.setThemeMode(ThemeMode.valueOf(p.optString("themeMode", "SYSTEM"))) }
                 prefs.setDynamicColor(p.optBoolean("dynamicColour", false))
-                prefs.setPaletteId(p.optString("paletteId", "tide"))
                 prefs.setAmoled(p.optBoolean("amoled", false))
-                runCatching { prefs.setColourStyle(ColourStyle.valueOf(p.optString("colourStyle", "TONAL_SPOT"))) }
             }
 
             val days = root.optJSONArray("days") ?: JSONArray()

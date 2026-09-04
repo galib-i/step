@@ -33,7 +33,8 @@ fun GoalEditor(
     goal: Int,
     onGoalChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    keyboardTrigger: Boolean = false
+    keyboardTrigger: Boolean = false,
+    labelResId: Int = com.galib.step.R.string.steps_per_day
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -70,6 +71,7 @@ fun GoalEditor(
                             isEditing = false
                         }
                     ),
+                    visualTransformation = NumberCommaTransformation(),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
                 val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
@@ -93,12 +95,49 @@ fun GoalEditor(
                 )
             }
             Text(
-                text = androidx.compose.ui.res.stringResource(com.galib.step.R.string.steps_per_day),
+                text = androidx.compose.ui.res.stringResource(labelResId),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
 
+    }
+}
+
+class NumberCommaTransformation : androidx.compose.ui.text.input.VisualTransformation {
+    override fun filter(text: androidx.compose.ui.text.AnnotatedString): androidx.compose.ui.text.input.TransformedText {
+        val original = text.text
+        if (original.isEmpty()) return androidx.compose.ui.text.input.TransformedText(text, androidx.compose.ui.text.input.OffsetMapping.Identity)
+
+        val out = StringBuilder()
+        for (i in original.indices) {
+            out.append(original[i])
+            val distToEnd = original.length - i - 1
+            if (distToEnd > 0 && distToEnd % 3 == 0) {
+                out.append(",")
+            }
+        }
+        val formatted = out.toString()
+
+        val offsetMapping = object : androidx.compose.ui.text.input.OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                var commas = 0
+                for (i in 0 until offset) {
+                    val distToEnd = original.length - i - 1
+                    if (distToEnd > 0 && distToEnd % 3 == 0) commas++
+                }
+                return offset + commas
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                var commas = 0
+                for (i in 0 until offset) {
+                    if (formatted.getOrNull(i) == ',') commas++
+                }
+                return offset - commas
+            }
+        }
+        return androidx.compose.ui.text.input.TransformedText(androidx.compose.ui.text.AnnotatedString(formatted), offsetMapping)
     }
 }

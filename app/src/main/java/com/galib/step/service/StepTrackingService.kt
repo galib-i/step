@@ -134,8 +134,7 @@ class StepTrackingService : Service() {
 
         return NotificationCompat.Builder(this, Notifier.CHANNEL_TRACKING)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(getString(R.string.notif_steps_today, Formatters.steps(steps)))
-            .setContentText(getString(R.string.notif_goal_progress, progress, Formatters.steps(goal.toLong())))
+            .setContentTitle(getString(R.string.notif_steps_today, Formatters.steps(steps), Formatters.steps(goal.toLong()), progress))
             .setProgress(100, progress, false)
             .setOngoing(true)
             .setOnlyAlertOnce(true)

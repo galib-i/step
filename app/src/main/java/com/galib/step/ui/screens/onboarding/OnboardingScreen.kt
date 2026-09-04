@@ -56,10 +56,17 @@ import kotlin.math.absoluteValue
 
 class OnboardingViewModel : ViewModel() {
     var goal by androidx.compose.runtime.mutableIntStateOf(8000)
+    var weeklyGoal by androidx.compose.runtime.mutableIntStateOf(56000)
+
+    fun onDailyGoalChange(newGoal: Int) {
+        goal = newGoal
+        weeklyGoal = newGoal * 7
+    }
 
     fun complete(onDone: () -> Unit) {
         viewModelScope.launch {
             Graph.prefs.setDailyGoal(goal)
+            Graph.prefs.setWeeklyGoal(weeklyGoal)
             Graph.prefs.setOnboardingDone(true)
             runCatching { Graph.repository.sync() }
             onDone()
@@ -73,8 +80,14 @@ fun OnboardingScreen(
     onDone: () -> Unit,
     viewModel: OnboardingViewModel = viewModel()
 ) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
+    val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
+
+    val permissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+    ) { _ ->
+        viewModel.complete(onDone)
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
@@ -94,7 +107,8 @@ fun OnboardingScreen(
             ) {
                 when (page) {
                     0 -> WelcomePage()
-                    1 -> GoalPage(viewModel)
+                    1 -> GoalPage(viewModel, isActive = pagerState.currentPage == 1)
+                    2 -> WeeklyGoalPage(viewModel, isActive = pagerState.currentPage == 2)
                 }
             }
         }
@@ -107,7 +121,7 @@ fun OnboardingScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                repeat(2) { i ->
+                repeat(3) { i ->
                     val width by animateDpAsState(
                         targetValue = if (pagerState.currentPage == i) 28.dp else 8.dp,
                         label = "dot$i"
@@ -126,16 +140,27 @@ fun OnboardingScreen(
 
             Button(
                 onClick = {
-                    if (pagerState.currentPage < 1) {
+                    if (pagerState.currentPage < 2) {
                         scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
                     } else {
-                        viewModel.complete(onDone)
+                        val perms = mutableListOf<String>()
+                        if (android.os.Build.VERSION.SDK_INT >= 29) {
+                            perms.add(android.Manifest.permission.ACTIVITY_RECOGNITION)
+                        }
+                        if (android.os.Build.VERSION.SDK_INT >= 33) {
+                            perms.add(android.Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        if (perms.isNotEmpty()) {
+                            permissionLauncher.launch(perms.toTypedArray())
+                        } else {
+                            viewModel.complete(onDone)
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(),
                 modifier = Modifier.animateContentSize()
             ) {
-                if (pagerState.currentPage < 1) {
+                if (pagerState.currentPage < 2) {
                     Icon(
                         Icons.AutoMirrored.Rounded.ArrowForward,
                         contentDescription = stringResource(R.string.next_page)
@@ -200,7 +225,7 @@ private fun WelcomePage() {
 }
 
 @Composable
-private fun GoalPage(viewModel: OnboardingViewModel) {
+private fun GoalPage(viewModel: OnboardingViewModel, isActive: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -214,6 +239,30 @@ private fun GoalPage(viewModel: OnboardingViewModel) {
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(24.dp))
-        GoalEditor(goal = viewModel.goal, onGoalChange = { viewModel.goal = it })
+        GoalEditor(goal = viewModel.goal, onGoalChange = { viewModel.onDailyGoalChange(it) }, keyboardTrigger = isActive)
+    }
+}
+
+@Composable
+private fun WeeklyGoalPage(viewModel: OnboardingViewModel, isActive: Boolean) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            stringResource(R.string.set_your_weekly_target),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(Modifier.height(24.dp))
+        GoalEditor(
+            goal = viewModel.weeklyGoal,
+            onGoalChange = { viewModel.weeklyGoal = it },
+            keyboardTrigger = isActive,
+            labelResId = R.string.steps_per_week
+        )
     }
 }

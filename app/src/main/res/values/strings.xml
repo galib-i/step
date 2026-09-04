@@ -52,19 +52,17 @@
     <string name="about_sub">Step v%1$s</string>
 
     <!-- Onboarding -->
-    <string name="onboarding_tagline">Every step counts. Watch your days fill up with movement and little wins.</string>
-    <string name="set_your_pace">Set your pace</string>
+    <string name="onboarding_tagline">Every step gets you closer to your goal. Start slow and steady.</string>
+    <string name="set_your_pace">Set your daily target</string>
+    <string name="set_your_weekly_target">Set your weekly target</string>
     <string name="steps_per_day">steps per day</string>
-    <string name="lets_stride">Let\'s stride</string>
+    <string name="steps_per_week">steps per week</string>
+    <string name="lets_stride">Let\'s go</string>
     <string name="next_page">Next</string>
 
     <!-- Notifications -->
-    <string name="notif_steps_today">%1$s steps today</string>
-    <string name="notif_goal_progress">%1$d%% of %2$s goal</string>
+    <string name="notif_steps_today">%1$s / %2$s steps today (%3$d%%)</string>
     <string name="stop">Stop</string>
-
-    <!-- Live Updates (Android 16+) -->
-
 
     <string name="targets">Targets</string>
 </resources>

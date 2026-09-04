@@ -28,7 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -46,6 +46,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -182,6 +186,29 @@ fun DashboardScreen(
         if (granted) viewModel.startBackgroundTracking(context)
     }
 
+    var hasPermission by remember {
+        mutableStateOf(
+            android.os.Build.VERSION.SDK_INT < 29 ||
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context, android.Manifest.permission.ACTIVITY_RECOGNITION
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        )
+    }
+    
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasPermission = android.os.Build.VERSION.SDK_INT < 29 ||
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        context, android.Manifest.permission.ACTIVITY_RECOGNITION
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     fun ensureActivityPermission(): Boolean {
         val granted = android.os.Build.VERSION.SDK_INT < 29 ||
             androidx.core.content.ContextCompat.checkSelfPermission(
@@ -227,6 +254,7 @@ fun DashboardScreen(
             HeroCard(
                 stats = state.stats,
                 isTracking = state.prefs.backgroundTracking,
+                hasPermission = hasPermission,
                 onToggleTracking = {
                     if (state.prefs.backgroundTracking) {
                         viewModel.stopBackgroundTracking(context)
@@ -381,6 +409,7 @@ private fun DashboardHeader(
 private fun HeroCard(
     stats: DailyStats,
     isTracking: Boolean,
+    hasPermission: Boolean,
     onToggleTracking: () -> Unit,
     onEditGoal: () -> Unit,
     modifier: Modifier = Modifier
@@ -481,16 +510,17 @@ private fun HeroCard(
                 androidx.compose.material3.FilledTonalButton(
                     onClick = onToggleTracking,
                     shape = RoundedCornerShape(16.dp),
+                    enabled = isTracking || hasPermission,
                     modifier = Modifier.fillMaxWidth(0.6f).height(56.dp)
                 ) {
                     Icon(
-                        imageVector = if (isTracking) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                        contentDescription = if (isTracking) "Pause Tracking" else "Resume Tracking",
+                        imageVector = if (isTracking) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,
+                        contentDescription = if (isTracking) "Stop Tracking" else "Start Tracking",
                         modifier = Modifier.size(28.dp)
                     )
                     Spacer(Modifier.size(12.dp, 0.dp))
                     Text(
-                        text = if (isTracking) "Pause" else "Resume",
+                        text = if (isTracking) "Stop" else "Start",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }

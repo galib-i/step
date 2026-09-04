@@ -48,8 +48,7 @@ fun StepTheme(
         val dyn = if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         dyn.expressiveSurfaces(darkTheme)
     } else {
-        val palette = paletteById("tide")
-        if (darkTheme) palette.dark else palette.light
+        if (darkTheme) ForestDark else ForestLight
     }
     val colorScheme = base
         .let { if (prefs.amoled && darkTheme) it.applyAmoled() else it }
