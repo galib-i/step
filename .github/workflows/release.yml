@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle.kts', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-
+
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: "Step ${{ steps.version.outputs.VERSION }}"
+          tag_name: ${{ github.ref_name }}
+          body: |
+            ## Step ${{ steps.version.outputs.VERSION }}
+
+            ### What's new
+            See [commit history](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}) for changes.
+
+            ### Installation
+            Download the APK below and install it on your Android device.
+            > You may need to enable **Install from unknown sources** in your device settings.
+          files: app/build/outputs/apk/debug/app-debug.apk
+          draft: false
+          prerelease: false
