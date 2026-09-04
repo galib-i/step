@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -70,8 +69,7 @@ fun GoalEditor(
                 ToggleButton(
                     checked = checked,
                     onCheckedChange = { if (it) onGoalChange(preset) },
-                    modifier = Modifier.weight(1f),
-                    colors = ToggleButtonDefaults.toggleButtonColors()
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(Formatters.compactSteps(preset.toLong()))
                 }

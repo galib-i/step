@@ -18,7 +18,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.DirectionsWalk
+import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -83,10 +83,10 @@ fun OnboardingScreen(
             userScrollEnabled = true
         ) { page ->
             // Parallax: pages fade and shrink slightly while swiping
-            val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
-                .absoluteValue.coerceIn(0f, 1f)
             Box(
                 modifier = Modifier.graphicsLayer {
+                    val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
+                        .absoluteValue.coerceIn(0f, 1f)
                     alpha = 1f - pageOffset * 0.35f
                     scaleX = 1f - pageOffset * 0.06f
                     scaleY = 1f - pageOffset * 0.06f
@@ -175,10 +175,10 @@ private fun WelcomePage() {
                 trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
             )
             Icon(
-                Icons.Rounded.DirectionsWalk,
+                Icons.AutoMirrored.Rounded.DirectionsWalk,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(72.dp).bob(amplitude = 7.dp, durationMs = 1400)
+                modifier = Modifier.size(72.dp).bob(amplitude = 7.dp)
             )
         }
         Spacer(Modifier.height(40.dp))

@@ -29,16 +29,13 @@
     <string name="total">Total</string>
     <string name="best_day">Best day</string>
     <string name="goals_met">Goals met</string>
-    <string name="close">Close</string>
-    <string name="unlocked_on">Unlocked %1$s</string>
 
     <!-- Settings -->
-    <string name="appearance">Appearance</string>
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="wallpaper_colors">Material You Theme</string>
-    <string name="wallpaper_colors_sub">Use colors based on wallpaper</string>
+    <string name="wallpaper_colors_sub">Use colours based on wallpaper</string>
     <string name="amoled_black">AMOLED black</string>
     <string name="amoled_black_sub">Pure black dark mode for OLED panels</string>
 
@@ -46,10 +43,8 @@
     <string name="weekly_goal">Weekly goal</string>
     <string name="off">Off</string>
     <string name="steps_value">%1$s steps</string>
-    <string name="tracking">Tracking</string>
     <string name="background_tracking">Background tracking</string>
     <string name="background_tracking_sub">Count steps all day with a live notification. Turn off to force-stop.</string>
-    <string name="data">Data</string>
     <string name="export_backup">Export backup</string>
     <string name="export_backup_sub">Save history and settings to a file</string>
     <string name="import_backup">Import backup</string>
@@ -57,7 +52,6 @@
     <string name="backup_exported">Backup saved</string>
     <string name="backup_imported">Backup restored — %1$d days</string>
     <string name="backup_failed">That file couldn\'t be read</string>
-    <string name="language">Language</string>
     <string name="app_language">App language</string>
     <string name="app_language_sub">Choose Step\'s language</string>
     <string name="about">About</string>
@@ -76,8 +70,6 @@
     <string name="notif_steps_today">%1$s steps today</string>
     <string name="notif_goal_progress">%1$d%% of %2$s goal</string>
     <string name="stop">Stop</string>
-
-    <string name="this_month">This month</string>
 
     <string name="tracking_active">Background tracking is on</string>
 

@@ -36,11 +36,6 @@ interface SummaryDao {
     @Query("SELECT * FROM daily_summary ORDER BY epochDay ASC")
     suspend fun getAll(): List<DailySummaryEntity>
 
-    @Query("SELECT * FROM daily_summary WHERE epochDay BETWEEN :from AND :to ORDER BY epochDay ASC")
-    suspend fun getRange(from: Long, to: Long): List<DailySummaryEntity>
-
-    @Query("SELECT * FROM daily_summary WHERE epochDay = :epochDay")
-    suspend fun getDay(epochDay: Long): DailySummaryEntity?
 }
 
 @Database(

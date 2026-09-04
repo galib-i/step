@@ -14,6 +14,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import kotlin.time.Duration.Companion.milliseconds
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,8 +29,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Sync
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -55,7 +54,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -73,7 +71,6 @@ import com.galib.step.model.DailyStats
 import com.galib.step.model.StepPrefs
 import com.galib.step.ui.components.AnimatedCounter
 import com.galib.step.ui.components.GoalEditor
-import com.galib.step.ui.components.bouncyClickable
 import com.galib.step.ui.components.entrance
 import com.galib.step.ui.components.pulse
 import com.galib.step.util.Formatters
@@ -86,7 +83,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 data class DashboardUiState(
     val stats: DailyStats = DailyStats.empty(),
@@ -134,7 +131,7 @@ class DashboardViewModel : ViewModel() {
         viewModelScope.launch {
             isRefreshing.value = true
             runCatching { repo.sync() }
-            delay(350)
+            delay(350.milliseconds)
             isRefreshing.value = false
         }
     }
@@ -160,6 +157,7 @@ fun DashboardScreen(
     val context = LocalContext.current
 
     var showGoalSheet by remember { mutableStateOf(false) }
+    @Suppress("DEPRECATION")
     val goalSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // Haptic tick every 1,000 steps
@@ -258,7 +256,7 @@ private fun DashboardHeader(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMM", Locale.getDefault())),
+                text = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMM", LocalLocale.current.platformLocale)),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )

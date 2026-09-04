@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -58,7 +59,7 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 class HistoryViewModel : ViewModel() {
     private val repo = Graph.repository
@@ -80,7 +81,7 @@ class HistoryViewModel : ViewModel() {
 fun HistoryScreen(viewModel: HistoryViewModel = viewModel()) {
     val data by viewModel.data.collectAsStateWithLifecycle()
     var monthMode by rememberSaveable { mutableStateOf(false) }
-    var weekOffset by rememberSaveable { mutableStateOf(0) }
+    var weekOffset by rememberSaveable { mutableIntStateOf(0) }
     var month by remember { mutableStateOf(YearMonth.now()) }
     var selected by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
 
@@ -240,7 +241,7 @@ private fun MonthSection(
                     Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, stringResource(R.string.previous))
                 }
                 Text(
-                    text = month.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
+                    text = month.format(DateTimeFormatter.ofPattern("MMMM yyyy", LocalLocale.current.platformLocale)),
                     style = MaterialTheme.typography.titleMedium
                 )
                 IconButton(
@@ -265,7 +266,7 @@ private fun DayDetailCard(date: LocalDate, bar: DayBar?) {
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(
-                text = date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.getDefault())),
+                text = date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", LocalLocale.current.platformLocale)),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )

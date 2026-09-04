@@ -10,7 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
+import android.annotation.SuppressLint
+
 /** Tiny hand-rolled service locator — the app is small enough not to need DI. */
+@SuppressLint("StaticFieldLeak")
 object Graph {
     lateinit var prefs: UserPreferences
         private set
@@ -37,7 +40,7 @@ object Graph {
             database = StepDatabase.build(app)
             stepSensor = StepSensorManager(app)
             notifier = Notifier(app)
-            repository = StepRepository(stepSensor, database, prefs, appScope)
+            repository = StepRepository(stepSensor, database, prefs)
             initialized = true
         }
     }

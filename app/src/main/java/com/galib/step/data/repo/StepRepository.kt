@@ -6,7 +6,6 @@ import com.galib.step.data.health.StepSensorManager
 import com.galib.step.data.prefs.UserPreferences
 import com.galib.step.model.DailyStats
 import com.galib.step.model.StatSource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -15,12 +14,12 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.time.LocalDate
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 
 class StepRepository(
     private val sensor: StepSensorManager,
     private val db: StepDatabase,
-    private val prefs: UserPreferences,
-    val scope: CoroutineScope
+    private val prefs: UserPreferences
 ) {
     // The activity and the tracking service both stream the hardware sensor;
     // without this lock two coroutines could read the same baseline and apply
@@ -45,14 +44,14 @@ class StepRepository(
         db.summaryDao().observeRange(from.toEpochDay(), to.toEpochDay())
 
     /** Cheap refresh of just the last couple of days — safe to call often. */
-    suspend fun syncToday() = sync(historyDays = 2)
+    suspend fun syncToday() = sync()
 
     /**
      * Pulls fresh data from the hardware sensor into Room.
      */
-    suspend fun sync(historyDays: Long = 90) {
+    suspend fun sync() {
         if (sensor.isAvailable) {
-            val raw = withTimeoutOrNull(3000) { sensor.rawSteps().firstOrNull() }
+            val raw = withTimeoutOrNull(3000.milliseconds) { sensor.rawSteps().firstOrNull() }
             if (raw != null) onSensorRaw(raw)
         }
     }

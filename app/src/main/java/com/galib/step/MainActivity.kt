@@ -16,10 +16,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -67,6 +65,7 @@ import com.galib.step.ui.screens.settings.SettingsScreen
 import com.galib.step.ui.theme.StepTheme
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : ComponentActivity() {
 
@@ -80,9 +79,8 @@ class MainActivity : ComponentActivity() {
         splash.setKeepOnScreenCondition { !prefsLoaded }
 
         setContent {
-            val prefsState by Graph.prefs.prefs
-                .map { it as StepPrefs? }
-                .collectAsState(initial = null)
+            val prefsFlow = remember { Graph.prefs.prefs.map { it as StepPrefs? } }
+            val prefsState by prefsFlow.collectAsState(initial = null)
 
             val prefs = prefsState
             if (prefs != null) prefsLoaded = true
@@ -117,7 +115,7 @@ class MainActivity : ComponentActivity() {
                 // Fallback poll for live numbers even when the sensor is quiet
                 launch {
                     while (true) {
-                        kotlinx.coroutines.delay(15_000)
+                        kotlinx.coroutines.delay(15_000.milliseconds)
                         runCatching { repo.syncToday() }
                     }
                 }

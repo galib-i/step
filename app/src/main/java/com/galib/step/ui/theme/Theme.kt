@@ -67,7 +67,7 @@ fun StepTheme(
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
         motionScheme = MotionScheme.expressive(),
-        typography = strideTypography(prefs),
+        typography = strideTypography(),
         content = content
     )
 }

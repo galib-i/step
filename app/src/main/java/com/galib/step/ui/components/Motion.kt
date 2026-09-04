@@ -14,12 +14,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import kotlin.time.Duration.Companion.milliseconds
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,7 +36,7 @@ fun Modifier.entrance(index: Int = 0): Modifier {
     val offsetAnim = remember { Animatable(34f) }
     val scaleAnim = remember { Animatable(0.95f) }
     LaunchedEffect(Unit) {
-        delay(index * 42L)
+        delay((index * 42L).milliseconds)
         launch { alphaAnim.animateTo(1f, tween(210, easing = LinearOutSlowInEasing)) }
         launch {
             offsetAnim.animateTo(
@@ -111,7 +111,7 @@ fun Modifier.pulse(from: Float = 1f, to: Float = 1.1f, durationMs: Int = 1500): 
 
 /** Infinite vertical bob — for onboarding art. */
 @Composable
-fun Modifier.bob(amplitude: Dp = 5.dp, durationMs: Int = 1800): Modifier {
+fun Modifier.bob(amplitude: Dp = 5.dp, durationMs: Int = 1400): Modifier {
     val transition = rememberInfiniteTransition(label = "bob")
     val offset by transition.animateFloat(
         initialValue = -1f,

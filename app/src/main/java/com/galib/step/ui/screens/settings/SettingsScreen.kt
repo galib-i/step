@@ -6,14 +6,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,21 +16,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
 import androidx.compose.material.icons.rounded.CalendarMonth
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Contrast
-import androidx.compose.material.icons.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Splitscreen
-import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.Wallpaper
@@ -47,12 +35,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -85,6 +72,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 class SettingsViewModel : ViewModel() {
     private val prefs = Graph.prefs
@@ -133,26 +121,32 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
-        if (uri != null) scope.launch {
-            BackupManager.export(context, uri)
-                .onSuccess { Toast.makeText(context, exportedMsg, Toast.LENGTH_SHORT).show() }
-                .onFailure { Toast.makeText(context, backupFailedMsg, Toast.LENGTH_SHORT).show() }
+        if (uri != null) {
+            val appContext = context.applicationContext
+            scope.launch {
+                BackupManager.export(appContext, uri)
+                    .onSuccess { Toast.makeText(appContext, exportedMsg, Toast.LENGTH_SHORT).show() }
+                    .onFailure { Toast.makeText(appContext, backupFailedMsg, Toast.LENGTH_SHORT).show() }
+            }
         }
     }
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
-        if (uri != null) scope.launch {
-            BackupManager.import(context, uri)
-                .onSuccess { days ->
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.backup_imported, days),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Graph.appScope.launch { runCatching { Graph.repository.syncToday() } }
-                }
-                .onFailure { Toast.makeText(context, backupFailedMsg, Toast.LENGTH_SHORT).show() }
+        if (uri != null) {
+            val appContext = context.applicationContext
+            scope.launch {
+                BackupManager.import(appContext, uri)
+                    .onSuccess { days ->
+                        Toast.makeText(
+                            appContext,
+                            appContext.getString(R.string.backup_imported, days),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Graph.appScope.launch { runCatching { Graph.repository.syncToday() } }
+                    }
+                    .onFailure { Toast.makeText(appContext, backupFailedMsg, Toast.LENGTH_SHORT).show() }
+            }
         }
     }
 
@@ -176,7 +170,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             modifier = Modifier.entrance(0)
         )
 
-        SettingsCard(title = stringResource(R.string.appearance), modifier = Modifier.entrance(1)) {
+        SettingsCard(modifier = Modifier.entrance(1)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 ThemeMode.entries.forEach { mode ->
                     ToggleButton(
@@ -202,7 +196,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 ) {
                     IconSwitch(
                         checked = prefs.dynamicColor,
-                        icon = Icons.Rounded.Palette,
                         onCheckedChange = { on -> viewModel.set { viewModel.p.setDynamicColor(on) } }
                     )
                 }
@@ -214,14 +207,13 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             ) {
                 IconSwitch(
                     checked = prefs.amoled,
-                    icon = Icons.Rounded.Contrast,
                     onCheckedChange = { on -> viewModel.set { viewModel.p.setAmoled(on) } }
                 )
             }
 
         }
 
-        SettingsCard(title = stringResource(R.string.tracking), modifier = Modifier.entrance(2)) {
+        SettingsCard(modifier = Modifier.entrance(2)) {
             if (Build.VERSION.SDK_INT >= 36) {
                 SettingRow(
                     title = stringResource(R.string.live_updates),
@@ -230,9 +222,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 ) {
                     IconSwitch(
                         checked = prefs.liveUpdates,
-                        icon = Icons.Rounded.Splitscreen,
                         onCheckedChange = { on ->
-                            if (on && Build.VERSION.SDK_INT >= 33) {
+                            if (on) {
                                 notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                             }
                             viewModel.set { viewModel.p.setLiveUpdates(on) }
@@ -250,7 +241,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             ) {
                 IconSwitch(
                     checked = prefs.backgroundTracking,
-                    icon = Icons.Rounded.DirectionsWalk,
                     onCheckedChange = { on ->
                         if (on && Build.VERSION.SDK_INT >= 33) {
                             notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -266,7 +256,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             }
         }
 
-        SettingsCard(title = stringResource(R.string.daily_goal), modifier = Modifier.entrance(3)) {
+        SettingsCard(modifier = Modifier.entrance(3)) {
             SettingRow(
                 title = stringResource(R.string.daily_goal),
                 subtitle = stringResource(R.string.steps_value, Formatters.steps(prefs.dailyGoal.toLong())),
@@ -295,7 +285,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
 
 
-        SettingsCard(title = stringResource(R.string.data), modifier = Modifier.entrance(5)) {
+        SettingsCard(modifier = Modifier.entrance(5)) {
             SettingRow(
                 title = stringResource(R.string.export_backup),
                 subtitle = stringResource(R.string.export_backup_sub),
@@ -310,29 +300,15 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             )
         }
 
-        if (Build.VERSION.SDK_INT >= 33) {
-            SettingsCard(title = stringResource(R.string.language), modifier = Modifier.entrance(6)) {
-                SettingRow(
-                    title = stringResource(R.string.app_language),
-                    subtitle = stringResource(R.string.app_language_sub),
-                    icon = Icons.Rounded.Language,
-                    onClick = {
-                        runCatching {
-                            context.startActivity(
-                                Intent(android.provider.Settings.ACTION_APP_LOCALE_SETTINGS).apply {
-                                    data = android.net.Uri.parse("package:${context.packageName}")
-                                }
-                            )
-                        }
-                        Unit
-                    }
-                )
-            }
+        SettingsCard(modifier = Modifier.entrance(6)) {
+            SettingRow(
+                title = stringResource(R.string.app_language),
+                subtitle = stringResource(R.string.app_language_sub),
+                icon = Icons.Rounded.Language
+            )
         }
 
-
-
-        SettingsCard(title = stringResource(R.string.about), modifier = Modifier.entrance(8)) {
+        SettingsCard(modifier = Modifier.entrance(8)) {
             SettingRow(
                 title = stringResource(R.string.about),
                 subtitle = stringResource(R.string.about_sub, com.galib.step.BuildConfig.VERSION_NAME),
@@ -340,9 +316,9 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 onClick = {
                     runCatching {
                         context.startActivity(
-                            android.content.Intent(
-                                android.content.Intent.ACTION_VIEW,
-                                android.net.Uri.parse("https://github.com/galib-i/step")
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                "https://github.com/galib-i/step".toUri()
                             )
                         )
                     }
@@ -387,7 +363,7 @@ private data class SliderDialogSpec(
 
 @Composable
 private fun SliderDialog(spec: SliderDialogSpec, onDismiss: () -> Unit) {
-    var value by remember { mutableStateOf(spec.value) }
+    var value by remember { mutableFloatStateOf(spec.value) }
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -416,7 +392,7 @@ private fun SliderDialog(spec: SliderDialogSpec, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun SettingsCard(title: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+private fun SettingsCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = modifier) {
         Surface(
             shape = RoundedCornerShape(24.dp),
@@ -482,7 +458,6 @@ private fun SettingRow(
 @Composable
 private fun IconSwitch(
     checked: Boolean,
-    icon: ImageVector,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Switch(

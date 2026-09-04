@@ -15,19 +15,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import kotlin.time.Duration.Companion.milliseconds
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,14 +37,14 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle as JavaTextStyle
-import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 data class DayBar(
     val date: LocalDate,
     val steps: Long,
     val goal: Int
 ) {
-    val goalMet: Boolean get() = goal > 0 && steps >= goal
+    val goalMet: Boolean get() = goal in 1..steps
 }
 
 /**
@@ -80,7 +78,7 @@ fun WeeklyBarChart(
             val barAnim = remember(day.date) { Animatable(0.045f) }
             val target = (day.steps.toFloat() / maxSteps).coerceIn(0.045f, 1f)
             LaunchedEffect(target) {
-                delay(index * 45L)
+                delay((index * 45L).milliseconds)
                 barAnim.animateTo(
                     target,
                     spring(
@@ -141,7 +139,7 @@ fun WeeklyBarChart(
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = day.date.dayOfWeek.getDisplayName(JavaTextStyle.NARROW, Locale.getDefault()),
+                    text = day.date.dayOfWeek.getDisplayName(JavaTextStyle.NARROW, LocalLocale.current.platformLocale),
                     style = MaterialTheme.typography.labelMedium,
                     color = if (isToday) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurfaceVariant
@@ -179,7 +177,7 @@ fun MonthHeatmap(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             DayOfWeek.entries.forEach { dow ->
                 Text(
-                    text = dow.getDisplayName(JavaTextStyle.NARROW, Locale.getDefault()),
+                    text = dow.getDisplayName(JavaTextStyle.NARROW, LocalLocale.current.platformLocale),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,

@@ -1,7 +1,6 @@
 package com.galib.step.service
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
@@ -15,6 +14,7 @@ import com.galib.step.MainActivity
 import com.galib.step.R
 import com.galib.step.notifications.Notifier
 import com.galib.step.util.Formatters
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,6 +48,7 @@ class StepTrackingService : Service() {
         Graph.ensureInit(this)
     }
 
+    @android.annotation.SuppressLint("InlinedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
             scope.launch { Graph.prefs.setBackgroundTracking(false) }
@@ -61,7 +62,7 @@ class StepTrackingService : Service() {
         // isn't, fall back to a plain foreground start so the ongoing count can
         // still run off Health Connect data.
         val healthGranted = android.os.Build.VERSION.SDK_INT < 29 ||
-            androidx.core.content.ContextCompat.checkSelfPermission(
+            ContextCompat.checkSelfPermission(
                 this, android.Manifest.permission.ACTIVITY_RECOGNITION
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         val started = runCatching {
@@ -98,7 +99,7 @@ class StepTrackingService : Service() {
                 launch {
                     while (isActive) {
                         runCatching { Graph.repository.syncToday() }
-                        delay(5 * 60_000)
+                        delay((5 * 60_000).milliseconds)
                     }
                 }
                 // Live-update preference drives whether the ongoing notification
@@ -173,6 +174,7 @@ class StepTrackingService : Service() {
             .build()
     }
 
+    @android.annotation.SuppressLint("WrongConstant")
     @androidx.annotation.RequiresApi(36)
     private fun buildLiveUpdateNotification(
         progress: Int,
@@ -181,7 +183,7 @@ class StepTrackingService : Service() {
         openIntent: PendingIntent,
         stopIntent: PendingIntent
     ): Notification {
-        val accent = androidx.core.content.ContextCompat.getColor(this, R.color.live_update_accent)
+        val accent = ContextCompat.getColor(this, R.color.live_update_accent)
 
         // The tracker icon rides along the bar as the day fills up; the segment
         // spans the whole goal so progress reads as "% of goal".
