@@ -26,8 +26,8 @@
     <string name="next">Next</string>
     <string name="day_steps">%1$s steps</string>
     <string name="total">Total</string>
-    <string name="best_day">Best day</string>
-    <string name="goals_met">Goals met</string>
+    <string name="best_day">Best</string>
+    <string name="goals_met">Targets</string>
 
     <!-- Settings -->
     <string name="theme_system">System</string>

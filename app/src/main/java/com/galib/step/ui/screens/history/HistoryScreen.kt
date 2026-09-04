@@ -1,5 +1,6 @@
 package com.galib.step.ui.screens.history
 
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -308,16 +309,19 @@ private fun TotalsCard(
                 .padding(20.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            TotalStat(stringResource(R.string.total), Formatters.compactSteps(total))
-            TotalStat(stringResource(R.string.best_day), best?.let { Formatters.compactSteps(it.steps) } ?: "—")
-            TotalStat(stringResource(R.string.goals_met), "$goalsMet")
+            TotalStat(stringResource(R.string.total), Formatters.compactSteps(total), modifier = Modifier.weight(1f))
+            TotalStat(stringResource(R.string.best_day), best?.let { Formatters.compactSteps(it.steps) } ?: "—", modifier = Modifier.weight(1f))
+            TotalStat(stringResource(R.string.goals_met), "$goalsMet", modifier = Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun TotalStat(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+private fun TotalStat(label: String, value: String, modifier: Modifier = Modifier) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
         Text(
             text = value,
             style = MaterialTheme.typography.headlineSmall,
@@ -326,7 +330,8 @@ private fun TotalStat(label: String, value: String) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
     }
 }
