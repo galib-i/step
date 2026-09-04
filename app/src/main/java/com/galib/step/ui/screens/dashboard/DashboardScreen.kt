@@ -35,6 +35,9 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -140,6 +143,10 @@ class DashboardViewModel : ViewModel() {
         viewModelScope.launch { prefs.setDailyGoal(goal) }
     }
 
+    fun setWeeklyGoal(goal: Int) {
+        viewModelScope.launch { prefs.setWeeklyGoal(goal) }
+    }
+
     fun stopBackgroundTracking(context: Context) {
         com.galib.step.service.StepTrackingService.stop(context)
         viewModelScope.launch { prefs.setBackgroundTracking(false) }
@@ -230,12 +237,52 @@ fun DashboardScreen(
             sheetState = goalSheetState
         ) {
             Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
-                Text(
-                    stringResource(R.string.daily_goal),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                GoalEditor(goal = state.prefs.dailyGoal, onGoalChange = { viewModel.setGoal(it) })
+                var selectedGoalType by remember { mutableStateOf("Daily") }
+
+                @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.targets),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.height(32.dp)) {
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                            onClick = { selectedGoalType = "Daily" },
+                            selected = selectedGoalType == "Daily",
+                            icon = {}
+                        ) {
+                            Text("Daily", style = MaterialTheme.typography.labelMedium)
+                        }
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                            onClick = { selectedGoalType = "Weekly" },
+                            selected = selectedGoalType == "Weekly",
+                            icon = {}
+                        ) {
+                            Text("Weekly", style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+                }
+
+                if (selectedGoalType == "Daily") {
+                    GoalEditor(
+                        goal = state.prefs.dailyGoal,
+                        onGoalChange = { viewModel.setGoal(it) },
+                        keyboardTrigger = goalSheetState.currentValue == androidx.compose.material3.SheetValue.Expanded
+                    )
+                } else {
+                    GoalEditor(
+                        goal = state.prefs.weeklyGoal,
+                        onGoalChange = { viewModel.setWeeklyGoal(it) },
+                        keyboardTrigger = goalSheetState.currentValue == androidx.compose.material3.SheetValue.Expanded
+                    )
+                }
                 Spacer(Modifier.height(32.dp))
             }
         }

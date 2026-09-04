@@ -18,7 +18,6 @@
 
 
     <string name="edit_goal">Edit goal</string>
-    <string name="daily_goal">Daily goal</string>
 
     <!-- History -->
     <string name="week">Week</string>
@@ -40,9 +39,6 @@
     <string name="amoled_black_sub">Pure black dark mode for OLED panels</string>
 
 
-    <string name="weekly_goal">Weekly goal</string>
-    <string name="off">Off</string>
-    <string name="steps_value">%1$s steps</string>
     <string name="background_tracking">Background tracking</string>
     <string name="background_tracking_sub">Count steps all day with a live notification. Turn off to force-stop.</string>
     <string name="export_backup">Export backup</string>
@@ -56,8 +52,6 @@
     <string name="app_language_sub">Choose Step\'s language</string>
     <string name="about">About</string>
     <string name="about_sub">Step v%1$s</string>
-    <string name="done">Done</string>
-    <string name="cancel">Cancel</string>
 
     <!-- Onboarding -->
     <string name="onboarding_tagline">Every step counts. Watch your days fill up with movement and little wins.</string>
@@ -77,4 +71,5 @@
     <string name="live_updates">Live updates</string>
     <string name="live_updates_sub">Show a live step chip in the status bar and lock screen while tracking (Android 16+).</string>
 
+    <string name="targets">Targets</string>
 </resources>

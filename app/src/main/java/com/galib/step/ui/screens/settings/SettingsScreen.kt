@@ -20,31 +20,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
-import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Contrast
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Splitscreen
-import androidx.compose.material.icons.rounded.TrackChanges
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.Wallpaper
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,12 +54,10 @@ import com.galib.step.data.backup.BackupManager
 import com.galib.step.model.StepPrefs
 import com.galib.step.model.ThemeMode
 import com.galib.step.service.StepTrackingService
-import com.galib.step.ui.components.GoalEditor
-import com.galib.step.ui.components.StepSlider
+
 import com.galib.step.ui.components.bouncyClickable
 import com.galib.step.ui.components.entrance
 
-import com.galib.step.util.Formatters
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -150,8 +140,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
         }
     }
 
-    var showGoalDialog by remember { mutableStateOf(false) }
-    var sliderDialog by remember { mutableStateOf<SliderDialogSpec?>(null) }
+
 
 
 
@@ -256,32 +245,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
             }
         }
 
-        SettingsCard(modifier = Modifier.entrance(3)) {
-            SettingRow(
-                title = stringResource(R.string.daily_goal),
-                subtitle = stringResource(R.string.steps_value, Formatters.steps(prefs.dailyGoal.toLong())),
-                icon = Icons.Rounded.TrackChanges,
-                onClick = { showGoalDialog = true }
-            )
-            val offLabel = stringResource(R.string.off)
-            SettingRow(
-                title = stringResource(R.string.weekly_goal),
-                icon = Icons.Rounded.CalendarMonth,
-                subtitle = if (prefs.weeklyGoal > 0)
-                    stringResource(R.string.steps_value, Formatters.steps(prefs.weeklyGoal.toLong()))
-                else offLabel,
-                onClick = {
-                    sliderDialog = SliderDialogSpec(
-                        titleRes = R.string.weekly_goal,
-                        value = prefs.weeklyGoal.toFloat(),
-                        range = 0f..200000f,
-                        step = 5000f,
-                        format = { v -> if (v <= 0f) offLabel else Formatters.steps(v.toLong()) },
-                        onDone = { v -> viewModel.set { viewModel.p.setWeeklyGoal(v.toInt()) } }
-                    )
-                }
-            )
-        }
+
 
 
 
@@ -331,64 +295,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
 
 
-    if (showGoalDialog) {
-        AlertDialog(
-            onDismissRequest = { showGoalDialog = false },
-            confirmButton = {
-                TextButton(onClick = { showGoalDialog = false }) { Text(stringResource(R.string.done)) }
-            },
-            title = { Text(stringResource(R.string.daily_goal)) },
-            text = {
-                GoalEditor(
-                    goal = prefs.dailyGoal,
-                    onGoalChange = { g -> viewModel.set { viewModel.p.setDailyGoal(g) } }
-                )
-            }
-        )
-    }
-
-    sliderDialog?.let { spec ->
-        SliderDialog(spec = spec, onDismiss = { sliderDialog = null })
-    }
-}
-
-private data class SliderDialogSpec(
-    val titleRes: Int,
-    val value: Float,
-    val range: ClosedFloatingPointRange<Float>,
-    val step: Float,
-    val format: (Float) -> String,
-    val onDone: (Float) -> Unit
-)
-
-@Composable
-private fun SliderDialog(spec: SliderDialogSpec, onDismiss: () -> Unit) {
-    var value by remember { mutableFloatStateOf(spec.value) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                spec.onDone(value)
-                onDismiss()
-            }) { Text(stringResource(R.string.done)) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
-        title = { Text(stringResource(spec.titleRes)) },
-        text = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = spec.format(value),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                StepSlider(
-                    value = value,
-                    onValueChange = { v -> value = (v / spec.step).toInt() * spec.step },
-                    valueRange = spec.range
-                )
-            }
-        }
-    )
 }
 
 @Composable
