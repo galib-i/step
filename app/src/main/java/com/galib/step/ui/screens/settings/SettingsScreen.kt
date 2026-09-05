@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Animation
 import androidx.compose.material.icons.rounded.Contrast
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
@@ -164,6 +165,16 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 Switch(
                     checked = prefs.amoled,
                     onCheckedChange = { on -> viewModel.set { viewModel.p.setAmoled(on) } }
+                )
+            }
+            SettingRow(
+                title = stringResource(R.string.disable_animations),
+                subtitle = stringResource(R.string.disable_animations_sub),
+                icon = Icons.Rounded.Animation
+            ) {
+                Switch(
+                    checked = prefs.disableAnimations,
+                    onCheckedChange = { on -> viewModel.set { viewModel.p.setDisableAnimations(on) } }
                 )
             }
         }

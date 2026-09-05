@@ -31,6 +31,8 @@ object BackupManager {
                     put("themeMode", prefs.themeMode.name)
                     put("dynamicColour", prefs.dynamicColour)
                     put("amoled", prefs.amoled)
+                    put("backgroundTracking", prefs.backgroundTracking)
+                    put("disableAnimations", prefs.disableAnimations)
                 })
                 put("days", JSONArray().apply {
                     days.forEach { d ->
@@ -67,6 +69,8 @@ object BackupManager {
                 runCatching { prefs.setThemeMode(ThemeMode.valueOf(p.optString("themeMode", "SYSTEM"))) }
                 prefs.setDynamicColor(p.optBoolean("dynamicColour", false))
                 prefs.setAmoled(p.optBoolean("amoled", false))
+                prefs.setBackgroundTracking(p.optBoolean("backgroundTracking", false))
+                prefs.setDisableAnimations(p.optBoolean("disableAnimations", false))
             }
 
             val days = root.optJSONArray("days") ?: JSONArray()

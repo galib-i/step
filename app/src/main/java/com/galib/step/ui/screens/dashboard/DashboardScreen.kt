@@ -255,6 +255,7 @@ fun DashboardScreen(
                 stats = state.stats,
                 isTracking = state.prefs.backgroundTracking,
                 hasPermission = hasPermission,
+                disableAnimations = state.prefs.disableAnimations,
                 onToggleTracking = {
                     if (state.prefs.backgroundTracking) {
                         viewModel.stopBackgroundTracking(context)
@@ -288,6 +289,7 @@ fun DashboardScreen(
                 WeeklyGoalCard(
                     weekSteps = state.weekSteps,
                     weeklyGoal = state.prefs.weeklyGoal,
+                    disableAnimations = state.prefs.disableAnimations,
                     modifier = Modifier.entrance(7)
                 )
             }
@@ -412,7 +414,8 @@ private fun HeroCard(
     hasPermission: Boolean,
     onToggleTracking: () -> Unit,
     onEditGoal: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    disableAnimations: Boolean = false
 ) {
     val progress by animateFloatAsState(
         targetValue = stats.progress.coerceIn(0f, 1f),
@@ -471,14 +474,13 @@ private fun HeroCard(
                     CircularWavyProgressIndicator(
                         progress = { progress },
                         modifier = Modifier.size(258.dp),
-                        color = if (goalHit) MaterialTheme.colorScheme.tertiary
-                        else MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                         stroke = ringStroke,
                         trackStroke = trackStroke,
                         wavelength = 38.dp,
                         amplitude = { if (goalHit) 1f else breathe },
-                        waveSpeed = if (goalHit) 26.dp else 10.dp
+                        waveSpeed = if (disableAnimations) 0.dp else 5.dp
                     )
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         AnimatedCounter(
@@ -502,8 +504,7 @@ private fun HeroCard(
                         )
                     },
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (goalHit) MaterialTheme.colorScheme.tertiary
-                    else MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center
                 )
                 
@@ -553,7 +554,7 @@ private fun SmallInfoCard(title: String, value: String, modifier: Modifier = Mod
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun WeeklyGoalCard(weekSteps: Long, weeklyGoal: Int, modifier: Modifier = Modifier) {
+private fun WeeklyGoalCard(weekSteps: Long, weeklyGoal: Int, modifier: Modifier = Modifier, disableAnimations: Boolean = false) {
     Surface(
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surfaceContainer,
@@ -587,7 +588,8 @@ private fun WeeklyGoalCard(weekSteps: Long, weeklyGoal: Int, modifier: Modifier 
                 stroke = barStroke,
                 trackStroke = barStroke,
                 amplitude = { 1f },
-                wavelength = 32.dp
+                wavelength = 32.dp,
+                waveSpeed = if (disableAnimations) 0.dp else 5.dp
             )
         }
     }

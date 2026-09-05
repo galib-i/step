@@ -28,5 +28,6 @@ data class StepPrefs(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColour: Boolean = false,
     val amoled: Boolean = false,
-    val backgroundTracking: Boolean = false
+    val backgroundTracking: Boolean = false,
+    val disableAnimations: Boolean = false
 )

@@ -13,8 +13,8 @@ android {
         minSdk = 26
         // API 36 — required for Android 16 Live Updates (promoted ProgressStyle)
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
         vectorDrawables.useSupportLibrary = true
     }
 

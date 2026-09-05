@@ -25,6 +25,7 @@ class UserPreferences(private val context: Context) {
         val dynamicColour = booleanPreferencesKey("dynamic_color")
         val amoled = booleanPreferencesKey("amoled")
         val backgroundTracking = booleanPreferencesKey("background_tracking")
+        val disableAnimations = booleanPreferencesKey("disable_animations")
 
         // Step-sensor bookkeeping
         val sensorLastRaw = longPreferencesKey("sensor_last_raw")
@@ -40,7 +41,8 @@ class UserPreferences(private val context: Context) {
             themeMode = runCatching { ThemeMode.valueOf(p[Keys.themeMode] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM),
             dynamicColour = p[Keys.dynamicColour] ?: false,
             amoled = p[Keys.amoled] ?: false,
-            backgroundTracking = p[Keys.backgroundTracking] ?: false
+            backgroundTracking = p[Keys.backgroundTracking] ?: false,
+            disableAnimations = p[Keys.disableAnimations] ?: false
         )
     }
 
@@ -53,6 +55,7 @@ class UserPreferences(private val context: Context) {
     suspend fun setDynamicColor(enabled: Boolean) = context.dataStore.edit { it[Keys.dynamicColour] = enabled }
     suspend fun setAmoled(enabled: Boolean) = context.dataStore.edit { it[Keys.amoled] = enabled }
     suspend fun setBackgroundTracking(enabled: Boolean) = context.dataStore.edit { it[Keys.backgroundTracking] = enabled }
+    suspend fun setDisableAnimations(enabled: Boolean) = context.dataStore.edit { it[Keys.disableAnimations] = enabled }
 
     data class SensorState(val lastRaw: Long, val dayEpoch: Long, val todaySteps: Long)
 

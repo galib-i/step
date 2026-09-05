@@ -14,7 +14,7 @@
     <string name="this_week">This week</string>
     <string name="of_steps_goal">of %1$s steps</string>
     <string name="steps_to_go">%1$s steps to go</string>
-    <string name="goal_crushed">Goal crushed — legendary! 🎉</string>
+    <string name="goal_crushed">You\'ve met your target! 🎉</string>
 
 
     <string name="edit_goal">Edit goal</string>
@@ -37,6 +37,8 @@
     <string name="wallpaper_colours_sub">Use colours based on wallpaper</string>
     <string name="amoled_black">AMOLED black</string>
     <string name="amoled_black_sub">Pure black dark mode for OLED panels</string>
+    <string name="disable_animations">Disable animations</string>
+    <string name="disable_animations_sub">Stop movement on progress lines</string>
 
 
     <string name="export_backup">Export backup</string>
