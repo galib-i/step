@@ -44,7 +44,7 @@ fun GoalEditor(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             var isEditing by remember { mutableStateOf(true) }
             val initialStr = goal.toString()
-            var textValue by remember { mutableStateOf(TextFieldValue(initialStr, TextRange(initialStr.length))) }
+            var textValue by remember(goal) { mutableStateOf(TextFieldValue(initialStr, TextRange(initialStr.length))) }
             val focusRequester = remember { FocusRequester() }
 
             if (isEditing) {

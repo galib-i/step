@@ -46,10 +46,13 @@
     <string name="import_backup">Import backup</string>
     <string name="import_backup_sub">Restore from a Step backup file</string>
     <string name="backup_exported">Backup saved</string>
-    <string name="backup_imported">Backup restored — %1$d days</string>
+    <plurals name="backup_imported">
+        <item quantity="one">Backup restored — %1$d day</item>
+        <item quantity="other">Backup restored — %1$d days</item>
+    </plurals>
     <string name="backup_failed">That file couldn\'t be read</string>
-    <string name="app_language">App language</string>
-    <string name="app_language_sub">Choose Step\'s language</string>
+    <string name="app_language">Language</string>
+    <string name="app_language_sub">English</string>
     <string name="about">About</string>
     <string name="about_sub">Step v%1$s</string>
 

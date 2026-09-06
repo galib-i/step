@@ -5,6 +5,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +29,6 @@ import androidx.compose.material.icons.rounded.Wallpaper
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
@@ -102,7 +102,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                     .onSuccess { days ->
                         Toast.makeText(
                             appContext,
-                            appContext.getString(R.string.backup_imported, days),
+                            appContext.resources.getQuantityString(R.plurals.backup_imported, days, days),
                             Toast.LENGTH_SHORT
                         ).show()
                         Graph.appScope.launch { runCatching { Graph.repository.syncToday() } }
@@ -128,7 +128,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
         )
 
         SettingsCard(modifier = Modifier.entrance(1)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(MaterialTheme.colorScheme.surfaceContainer).padding(horizontal = 18.dp, vertical = 8.dp)) {
                 ThemeMode.entries.forEach { mode ->
                     ToggleButton(
                         checked = prefs.themeMode == mode,
@@ -157,15 +157,17 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                     )
                 }
             }
-            SettingRow(
-                title = stringResource(R.string.amoled_black),
-                subtitle = stringResource(R.string.amoled_black_sub),
-                icon = Icons.Rounded.Contrast
-            ) {
-                Switch(
-                    checked = prefs.amoled,
-                    onCheckedChange = { on -> viewModel.set { viewModel.p.setAmoled(on) } }
-                )
+            if (prefs.themeMode != ThemeMode.LIGHT) {
+                SettingRow(
+                    title = stringResource(R.string.amoled_black),
+                    subtitle = stringResource(R.string.amoled_black_sub),
+                    icon = Icons.Rounded.Contrast
+                ) {
+                    Switch(
+                        checked = prefs.amoled,
+                        onCheckedChange = { on -> viewModel.set { viewModel.p.setAmoled(on) } }
+                    )
+                }
             }
             SettingRow(
                 title = stringResource(R.string.disable_animations),
@@ -226,19 +228,13 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
 
 @Composable
 private fun SettingsCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = modifier) {
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                content()
-            }
-        }
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp)),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        content()
     }
 }
 
@@ -253,13 +249,15 @@ private fun SettingRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .then(
-                if (onClick != null) Modifier
-                    .clip(RoundedCornerShape(14.dp))
-                    .bouncyClickable(scaleDown = 0.97f, onClick = onClick)
-                else Modifier
-            )
-            .padding(vertical = 8.dp),
+            .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .let { m ->
+                if (onClick != null) {
+                    m.clip(RoundedCornerShape(14.dp))
+                     .bouncyClickable(scaleDown = 0.97f, onClick = onClick)
+                } else m
+            }
+            .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -286,3 +284,5 @@ private fun SettingRow(
         trailing?.invoke()
     }
 }
+
+
