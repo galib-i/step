@@ -72,6 +72,10 @@ class StepRepository(
         var delta = raw - st.lastRaw
         if (st.lastRaw < 0) delta = 0                  // first reading ever
         if (delta < 0) delta = raw                     // device rebooted; counter restarted
+        
+        if (!p.backgroundTracking) {
+            delta = 0
+        }
         val newState = UserPreferences.SensorState(raw, today, st.todaySteps + max(delta, 0L))
         prefs.setSensorState(newState)
 
