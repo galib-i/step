@@ -11,10 +11,9 @@ android {
     defaultConfig {
         applicationId = "com.galib.step"
         minSdk = 26
-        // API 36 — required for Android 16 Live Updates (promoted ProgressStyle)
         targetSdk = 37
         versionCode = 4
-        versionName = "1.0.3"
+        versionName = "1.0.4"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -62,14 +61,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
     implementation("androidx.lifecycle:lifecycle-process:2.11.0")
 
-    implementation("androidx.compose.material3:material3:1.5.0-alpha27")
+    implementation("androidx.compose.material3:material3:1.5.0-alpha28")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.graphics:graphics-shapes:1.1.0")
-    implementation("androidx.navigation:navigation-compose:2.10.0")
+    implementation("androidx.navigation:navigation-compose:2.10.1")
 
-    implementation("androidx.room:room-runtime:2.8.4")
-    implementation("androidx.room:room-ktx:2.8.4")
-    ksp("androidx.room:room-compiler:2.8.4")
+    implementation("androidx.room:room-runtime:2.8.5")
+    implementation("androidx.room:room-ktx:2.8.5")
+    ksp("androidx.room:room-compiler:2.8.5")
 
     implementation("androidx.work:work-runtime-ktx:2.11.2")
     implementation("androidx.datastore:datastore-preferences:1.2.1")

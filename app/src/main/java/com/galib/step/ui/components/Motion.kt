@@ -90,25 +90,6 @@ fun Modifier.bouncyClickable(
     )
 }
 
-/** Gentle infinite breathing scale — for live elements. */
-@Composable
-fun Modifier.pulse(from: Float = 1f, to: Float = 1.1f, durationMs: Int = 1500): Modifier {
-    val transition = rememberInfiniteTransition(label = "pulse")
-    val scale by transition.animateFloat(
-        initialValue = from,
-        targetValue = to,
-        animationSpec = infiniteRepeatable(
-            tween(durationMs, easing = FastOutSlowInEasing),
-            RepeatMode.Reverse
-        ),
-        label = "pulseScale"
-    )
-    return graphicsLayer {
-        scaleX = scale
-        scaleY = scale
-    }
-}
-
 /** Infinite vertical bob — for onboarding art. */
 @Composable
 fun Modifier.bob(amplitude: Dp = 5.dp, durationMs: Int = 1400): Modifier {

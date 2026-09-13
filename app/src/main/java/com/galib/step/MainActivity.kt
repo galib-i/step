@@ -63,9 +63,9 @@ import com.galib.step.ui.screens.history.HistoryScreen
 import com.galib.step.ui.screens.onboarding.OnboardingScreen
 import com.galib.step.ui.screens.settings.SettingsScreen
 import com.galib.step.ui.theme.StepTheme
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : ComponentActivity() {
 
@@ -106,20 +106,20 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Foreground data: sync on start, stream the hardware sensor while
-        // visible when Health Connect isn't the active source.
         val repo = Graph.repository
+        val prefs = Graph.prefs
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { runCatching { repo.sync() } }
-                // Fallback poll for live numbers even when the sensor is quiet
-                launch {
-                    while (true) {
-                        kotlinx.coroutines.delay(15_000.milliseconds)
-                        runCatching { repo.syncToday() }
+                var liveJob: Job? = null
+                prefs.prefs.map { it.backgroundTracking }.collect { serviceRunning ->
+                    if (serviceRunning) {
+                        liveJob?.cancel()
+                        liveJob = null
+                    } else if (liveJob == null) {
+                        liveJob = launch { runCatching { repo.collectSensorLive() } }
                     }
                 }
-                runCatching { repo.collectSensorLive() }
             }
         }
     }
