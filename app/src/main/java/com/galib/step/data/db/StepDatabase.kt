@@ -49,7 +49,7 @@ abstract class StepDatabase : RoomDatabase() {
     companion object {
         fun build(context: Context): StepDatabase =
             Room.databaseBuilder(context, StepDatabase::class.java, "stride.db")
-                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigration(dropAllTables = true)
                 .build()
     }
 }

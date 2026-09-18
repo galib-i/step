@@ -42,10 +42,13 @@ jobs:
       - name: Build release APK
         env:
           KEYSTORE_PATH: ${{ runner.temp }}/release.jks
-          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
+        run: |
+          # Strip any non-ASCII / whitespace characters that break keytool
+          STORE_PASSWORD=$(printf '%s' "${{ secrets.STORE_PASSWORD }}" | tr -cd '[:print:]' | tr -d '[:space:]')
+          KEY_PASSWORD=$(printf '%s' "${{ secrets.KEY_PASSWORD }}" | tr -cd '[:print:]' | tr -d '[:space:]')
+          export STORE_PASSWORD KEY_PASSWORD
+          ./gradlew assembleRelease
 
       - name: Get version from tag
         id: version
