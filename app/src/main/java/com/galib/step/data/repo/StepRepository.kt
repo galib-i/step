@@ -13,7 +13,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.time.LocalDate
-import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
 class StepRepository(
@@ -43,9 +42,6 @@ class StepRepository(
     fun observeRange(from: LocalDate, to: LocalDate): Flow<List<DailySummaryEntity>> =
         db.summaryDao().observeRange(from.toEpochDay(), to.toEpochDay())
 
-    /** Cheap refresh of just the last couple of days — safe to call often. */
-    suspend fun syncToday() = sync()
-
     /**
      * Pulls fresh data from the hardware sensor into Room.
      */
@@ -60,30 +56,52 @@ class StepRepository(
     suspend fun onSensorRaw(raw: Long) = sensorMutex.withLock {
         val p = prefs.snapshot()
         val today = LocalDate.now().toEpochDay()
-        var st = prefs.sensorState()
+        val st = prefs.sensorState()
 
-        if (st.dayEpoch != today) {
-            st = UserPreferences.SensorState(
-                lastRaw = if (st.lastRaw < 0) raw else st.lastRaw,
-                dayEpoch = today,
-                todaySteps = 0
+        if (st.lastRaw < 0) { // Save current sensor reading to today's starting value
+            prefs.setSensorState(UserPreferences.SensorState(raw, today, 0L))
+            return@withLock
+        }
+
+        if (st.dayEpoch != today) { // Day rollover, do not count previous delta
+            prefs.setSensorState(UserPreferences.SensorState(raw, today, 0L))
+            db.summaryDao().upsert(
+                DailySummaryEntity(
+                    epochDay = today,
+                    steps = 0L,
+                    goal = p.dailyGoal,
+                    source = StatSource.SENSOR.name
+                )
             )
+            return@withLock
         }
-        var delta = raw - st.lastRaw
-        if (st.lastRaw < 0) delta = 0                  // first reading ever
-        if (delta < 0) delta = raw                     // device rebooted; counter restarted
-        
-        if (!p.backgroundTracking) {
-            delta = 0
+
+        if (!p.backgroundTracking) { // Do not add anything
+            prefs.setSensorState(
+                UserPreferences.SensorState(raw, today, st.todaySteps)
+            )
+            return@withLock
         }
-        val newState = UserPreferences.SensorState(raw, today, st.todaySteps + max(delta, 0L))
+
+        if (raw < st.lastRaw) { // Do not add entire raw value on counter reset
+            prefs.setSensorState(
+                UserPreferences.SensorState(raw, today, st.todaySteps)
+            )
+            return@withLock
+        }
+
+        val delta = (raw - st.lastRaw).coerceAtLeast(0L)
+        val newState = UserPreferences.SensorState(
+            lastRaw = raw,
+            dayEpoch = today,
+            todaySteps = st.todaySteps + delta
+        )
         prefs.setSensorState(newState)
 
-        val steps = newState.todaySteps
         db.summaryDao().upsert(
             DailySummaryEntity(
                 epochDay = today,
-                steps = steps,
+                steps = newState.todaySteps,
                 goal = p.dailyGoal,
                 source = StatSource.SENSOR.name
             )
@@ -98,5 +116,21 @@ class StepRepository(
         sensor.rawSteps().collect { raw ->
             onSensorRaw(raw)
         }
+    }
+
+    suspend fun rebaselineSensor() = sensorMutex.withLock {
+        val today = LocalDate.now().toEpochDay()
+        val currentRaw = withTimeoutOrNull(3000.milliseconds) {
+            sensor.rawSteps().firstOrNull()
+        } ?: return@withLock
+
+        val st = prefs.sensorState()
+        prefs.setSensorState(
+            UserPreferences.SensorState(
+                lastRaw = currentRaw,
+                dayEpoch = today,
+                todaySteps = if (st.dayEpoch == today) st.todaySteps else 0L
+            )
+        )
     }
 }

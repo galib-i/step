@@ -79,8 +79,7 @@ class MainActivity : ComponentActivity() {
         splash.setKeepOnScreenCondition { !prefsLoaded }
 
         setContent {
-            val prefsFlow = remember { Graph.prefs.prefs.map { it as StepPrefs? } }
-            val prefsState by prefsFlow.collectAsState(initial = null)
+            val prefsState by Graph.prefs.prefs.collectAsState(initial = null)
 
             val prefs = prefsState
             if (prefs != null) prefsLoaded = true

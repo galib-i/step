@@ -40,10 +40,10 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.Lifecycle
@@ -72,6 +72,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.galib.step.Graph
+import com.galib.step.service.StepTrackingService
 import com.galib.step.data.db.DailySummaryEntity
 import com.galib.step.model.DailyStats
 import com.galib.step.model.StepPrefs
@@ -150,17 +151,19 @@ class DashboardViewModel : ViewModel() {
     }
 
     fun stopBackgroundTracking(context: Context) {
-        com.galib.step.service.StepTrackingService.stop(context)
-        viewModelScope.launch { prefs.setBackgroundTracking(false) }
+        StepTrackingService.stop(context)
     }
 
     fun startBackgroundTracking(context: Context) {
-        runCatching { com.galib.step.service.StepTrackingService.start(context) }
-        viewModelScope.launch { prefs.setBackgroundTracking(true) }
+        viewModelScope.launch {
+            Graph.repository.rebaselineSensor() // Ignore steps when paused
+
+            runCatching { StepTrackingService.start(context) }
+            prefs.setBackgroundTracking(true)
+        }
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = viewModel()
@@ -302,7 +305,6 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
                 var selectedGoalType by remember { mutableStateOf("Daily") }
 
-                @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -387,7 +389,6 @@ private fun DashboardHeader(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun HeroCard(
     stats: DailyStats,
@@ -525,7 +526,6 @@ private fun SmallInfoCard(title: String, value: String, modifier: Modifier = Mod
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun WeeklyGoalCard(weekSteps: Long, weeklyGoal: Int, modifier: Modifier = Modifier, disableAnimations: Boolean = false) {
     Surface(

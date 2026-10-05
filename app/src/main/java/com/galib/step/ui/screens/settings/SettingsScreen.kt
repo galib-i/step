@@ -72,7 +72,6 @@ class SettingsViewModel : ViewModel() {
     val p = prefs
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
     val prefs by viewModel.state.collectAsStateWithLifecycle()
@@ -105,7 +104,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                             appContext.resources.getQuantityString(R.plurals.backup_imported, days, days),
                             Toast.LENGTH_SHORT
                         ).show()
-                        Graph.appScope.launch { runCatching { Graph.repository.syncToday() } }
+                        Graph.appScope.launch { runCatching { Graph.repository.sync() } }
                     }
                     .onFailure { Toast.makeText(appContext, backupFailedMsg, Toast.LENGTH_SHORT).show() }
             }

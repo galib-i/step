@@ -50,8 +50,7 @@ fun StepTheme(
     } else {
         if (darkTheme) ForestDark else ForestLight
     }
-    val colorScheme = base
-        .let { if (prefs.amoled && darkTheme) it.applyAmoled() else it }
+    val colorScheme = if (prefs.amoled && darkTheme) base.applyAmoled() else base
 
     val view = LocalView.current
     if (!view.isInEditMode) {

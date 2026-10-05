@@ -14,16 +14,13 @@ import com.galib.step.MainActivity
 import com.galib.step.R
 import com.galib.step.notifications.Notifier
 import com.galib.step.util.Formatters
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -56,8 +53,6 @@ class StepTrackingService : Service() {
 
         // The manifest declares FGS type "health", which on Android 14+ needs a
         // health permission (ACTIVITY_RECOGNITION) granted at runtime. When it
-        // isn't, fall back to a plain foreground start so the ongoing count can
-        // still run off Health Connect data.
         val healthGranted = android.os.Build.VERSION.SDK_INT < 29 ||
             ContextCompat.checkSelfPermission(
                 this, android.Manifest.permission.ACTIVITY_RECOGNITION
@@ -84,19 +79,11 @@ class StepTrackingService : Service() {
 
         if (trackingJob == null) {
             trackingJob = scope.launch {
-                // Hardware counter → repository (max-merged with Health Connect)
                 launch {
                     runCatching {
                         Graph.stepSensor.rawSteps().collect { raw ->
                             Graph.repository.onSensorRaw(raw)
                         }
-                    }
-                }
-                // Periodic full refresh
-                launch {
-                    while (isActive) {
-                        runCatching { Graph.repository.syncToday() }
-                        delay((5 * 60_000).milliseconds)
                     }
                 }
 

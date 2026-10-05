@@ -74,7 +74,6 @@ class OnboardingViewModel : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OnboardingScreen(
     onDone: () -> Unit,
@@ -173,7 +172,6 @@ fun OnboardingScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun WelcomePage() {
     Column(
