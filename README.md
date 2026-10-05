@@ -13,6 +13,7 @@ Just track your steps with daily and weekly targets - nothing else.
 
 ## Get Started
 Download the APK from [Releases](https://github.com/galib-i/step/releases/latest) (Android 8.0+).
+<br>*Updating may require creating a backup and uninstalling previous version.*
 
 **Physical activity** is a necessary permission to count the steps using your phone's sensor, and **Notifications** are used for an easy to glance progress bar.
 
